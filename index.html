@@ -165,7 +165,7 @@ button{font:inherit;color:inherit}
       <div style="margin-top:clamp(2.5rem,1.5rem + 3vw,4rem);display:flex;flex-wrap:wrap;gap:clamp(2.5rem,1.5rem + 2.5vw,4rem) clamp(1.25rem,.8rem + 2vw,2.5rem)">
         <sc-for list="{{ visible }}" as="p" hint-placeholder-count="4">
           <article style="{{ p.itemStyle }}">
-            <div style="{{ p.floatStyle }}"><button type="button" onClick="{{ p.open }}" onMouseEnter="{{ p.hoverOn }}" onMouseLeave="{{ p.hoverOff }}" onFocus="{{ p.hoverOn }}" onBlur="{{ p.hoverOff }}" aria-label="{{ p.title }}" style="{{ p.mediaStyle }}"></button></div>
+            <div style="{{ p.floatStyle }}"><button type="button" onClick="{{ p.open }}" onMouseEnter="{{ p.hoverOn }}" onMouseLeave="{{ p.hoverOff }}" onFocus="{{ p.hoverOn }}" onBlur="{{ p.hoverOff }}" aria-label="{{ p.title }}" style="{{ p.mediaStyle }}"><sc-if value="{{ p.noImg }}" hint-placeholder-val="{{ false }}"><span style="display:grid;justify-items:center;gap:.4rem;text-align:center;pointer-events:none"><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:clamp(2.5rem,1.5rem + 3vw,4rem);line-height:.9;color:#f2f2f2">{{ p.num }}</span><span style="font-size:.875rem;font-weight:600;color:#b5b5b8">Portada pendiente</span></span></sc-if></button></div>
           </article>
         </sc-for>
       </div>
@@ -291,7 +291,10 @@ button{font:inherit;color:inherit}
         <sc-if value="{{ active.hasContent }}" hint-placeholder-val="{{ true }}">
           <img src="{{ active.content }}" alt="{{ active.title }}" loading="lazy" style="display:block;width:100%;height:auto;border-radius:6px" />
         </sc-if>
-        <sc-if value="{{ active.noContent }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ active.isEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="width:100%;aspect-ratio:16 / 10"><image-slot id="caso-{{ active.id }}" shape="rounded" radius="6" placeholder="Imagen del proyecto"></image-slot></div>
+        </sc-if>
+        <sc-if value="{{ active.isVideos }}" hint-placeholder-val="{{ false }}">
           <div style="display:grid;gap:clamp(3rem,2rem + 3vw,4.5rem)">
             <sc-for list="{{ videoGroups }}" as="g" hint-placeholder-count="2">
               <div style="display:grid;gap:1.25rem">
@@ -331,18 +334,20 @@ class Component extends DCLogic {
   portRef = React.createRef();
   quote = 'Veo el diseño como una forma de interpretar el mundo y convertir ideas en experiencias visuales.'.split(' ');
   toolList = [
-    { code: 'Ai', name: 'Illustrator', bg: '#330000', fg: '#ff9a00', s: 56, w: { left: '2%', top: '22%' }, n: { left: '2%', top: '0' } },
-    { code: 'Ps', name: 'Photoshop', bg: '#001e36', fg: '#31a8ff', s: 48, w: { left: '7%', bottom: '6%' }, n: { left: '6%', bottom: '0' } },
-    { code: 'Pr', name: 'Premiere Pro', bg: '#00005b', fg: '#9999ff', s: 54, w: { right: '9%', bottom: '2%' }, n: { right: '4%', bottom: '4px' } },
-    { code: 'Ae', name: 'After Effects', bg: '#00005b', fg: '#d291ff', s: 66, w: { right: '2%', top: '14%' }, n: { right: '2%', top: '0' } },
-    { code: 'Id', name: 'InDesign', bg: '#49021f', fg: '#ff3366', s: 44, w: { left: '30%', top: '0' }, n: { left: '30%', top: '8px' } },
-    { code: 'GPT', name: 'ChatGPT', bg: '#000000', fg: '#f2f2f2', img: './assets/logo-chatgpt.png', blend: 'normal', s: 50, w: { right: '28%', top: '2%' }, n: { right: '28%', top: '4px' } },
-    { code: 'Cl', name: 'Claude', bg: '#d97757', fg: '#d97757', img: './assets/logo-claude.png', blend: 'normal', fill: true, s: 52, w: { left: '40%', bottom: '0' }, n: { left: '38%', bottom: '8px' } }
+    { code: 'Ai', name: 'Illustrator', bg: '#330000', fg: '#ff9a00', s: 56, w: { left: '1%', top: '16%' }, n: { left: '3%', top: '10px' } },
+    { code: 'Ps', name: 'Photoshop', bg: '#001e36', fg: '#31a8ff', s: 56, w: { left: '1%', bottom: '16%' }, n: { left: '3%', bottom: '10px' } },
+    { code: 'Id', name: 'InDesign', bg: '#49021f', fg: '#ff3366', s: 50, w: { left: '27%', top: '0' }, n: { left: '28%', top: '10px' } },
+    { code: 'GPT', name: 'ChatGPT', bg: '#000000', fg: '#f2f2f2', img: './assets/logo-chatgpt.png', blend: 'normal', s: 50, w: { right: '27%', top: '0' }, n: { right: '28%', top: '10px' } },
+    { code: 'Ae', name: 'After Effects', bg: '#00005b', fg: '#d291ff', s: 56, w: { right: '1%', top: '16%' }, n: { right: '3%', top: '10px' } },
+    { code: 'Pr', name: 'Premiere Pro', bg: '#00005b', fg: '#9999ff', s: 56, w: { right: '1%', bottom: '16%' }, n: { right: '3%', bottom: '10px' } },
+    { code: 'Cl', name: 'Claude', bg: '#d97757', fg: '#d97757', img: './assets/logo-claude.png', blend: 'normal', fill: true, s: 50, w: { left: '27%', bottom: '0' }, n: { left: '28%', bottom: '10px' } },
+    { code: 'Cdr', name: 'CorelDRAW', bg: 'transparent', fg: '#14e830', img: './assets/logo-coreldraw.png', blend: 'normal', fill: true, s: 50, w: { right: '27%', bottom: '0' }, n: { right: '28%', bottom: '10px' } }
   ];
 
   contentMap = {
     p1: './assets/contenido-01-photoshop.jpg', p2: './assets/contenido-02-illustrator.jpg', p3: './assets/contenido-03-redes.jpg',
-    p5: './assets/contenido-05-mailings.jpg', p6: './assets/contenido-06-calendarios.jpg'
+    p5: './assets/contenido-05-mailings.jpg', p6: './assets/contenido-06-calendarios.jpg',
+    p7: './assets/contenido-07-editorial.jpg', p8: './assets/contenido-08-coreldraw.jpg', p9: './assets/contenido-09-marca.jpg'
   };
   videoGroups = [
     { client: 'Banco Finandina', label: 'Videos de campaña', videos: [
@@ -359,7 +364,10 @@ class Component extends DCLogic {
     { id: 'p3', ch: ["Crear contenido visual capaz de captar la atención en entornos digitales saturados de información. Cada pieza debía comunicar una idea con claridad, adaptarse a la identidad de la marca y conectar con su público en pocos segundos.","Trabajé en la composición, la jerarquía tipográfica, el color y la selección de recursos visuales para desarrollar publicaciones con diferentes objetivos comunicativos. Adapté el lenguaje gráfico a cada marca, explorando estilos que van desde lo comercial hasta lo conceptual y creativo.","Una selección de piezas para Instagram y Facebook que evidencia la diversidad de estilos y necesidades de comunicación que puede abordar el diseño gráfico. Cada propuesta busca combinar identidad visual, claridad del mensaje e impacto gráfico."], title: 'Diseñando conexiones instantáneas', category: 'Manejo de redes sociales', year: '', img: './assets/proyecto-03-redes.jpg', desc: 'Contenido para Instagram y Facebook.', tools: 'Photoshop · Illustrator' },
     { id: 'p4', ch: ["Transformar información y conceptos en contenidos audiovisuales dinámicos, capaces de mantener el interés del espectador y facilitar la comprensión del mensaje. El desafío consiste en encontrar el equilibrio entre narrativa, ritmo e identidad visual.","Organicé el material audiovisual mediante cortes, secuencias y ajustes de ritmo en Premiere Pro. Complementé la edición con recursos gráficos, textos animados y elementos visuales para reforzar la narrativa y dar mayor dinamismo a cada contenido.","Una selección de piezas audiovisuales que integra edición, recursos gráficos y comunicación visual. Los proyectos muestran cómo la combinación de Premiere Pro y After Effects permite construir contenidos más dinámicos, claros y coherentes con su propósito."], title: 'Dándole ritmo a las ideas', category: 'Premiere Pro y After Effects', year: '', img: './assets/proyecto-04-videos.jpg', desc: 'Edición audiovisual, narrativa y motion graphics.', tools: 'Premiere Pro · After Effects' },
     { id: 'p5', ch: ["Diseñar comunicaciones digitales que transmitan información de manera clara y atractiva, manteniendo la identidad de cada marca. El reto consiste en captar la atención del destinatario y organizar el contenido para que el mensaje principal destaque.","Trabajé en la organización de la información, la jerarquía visual, la selección tipográfica y el uso estratégico del color. Desarrollé composiciones para comunicaciones corporativas y campañas promocionales, considerando tanto la lectura en correo electrónico como la adaptación a dispositivos móviles.","Una selección de mailings corporativos que combina diseño, contenido y consistencia de marca. Las piezas buscan facilitar la lectura, destacar la información relevante y ofrecer una experiencia de comunicación visual organizada en distintos formatos digitales."], title: 'Diseñando mensajes que conectan', category: 'Mailings corporativos', year: '', img: './assets/proyecto-05-mailings.jpg', desc: 'Diseño de mailings, comunicación visual y campañas digitales.', tools: 'Photoshop · Illustrator' },
-    { id: 'p6', ch: ["Diseñar calendarios empresariales que fueran más allá de su función práctica y se convirtieran en piezas de comunicación de marca. El desafío fue integrar información, identidad corporativa y una propuesta visual atractiva en un formato pensado para acompañar al usuario durante todo el año.","Exploré conceptos visuales, imágenes y recursos gráficos para construir las portadas y páginas interiores. Trabajé en la distribución de los calendarios, la jerarquía de la información, la tipografía y la relación entre los elementos decorativos y los espacios destinados a la consulta de fechas.","Una colección de calendarios de escritorio y pared que combina funcionalidad, diseño editorial e identidad corporativa. Cada propuesta busca convertir una herramienta cotidiana en un soporte visual que refuerce la presencia de la marca y aporte valor durante el año."], title: 'Diseñando el valor del tiempo', category: 'Calendarios corporativos', year: '2023 · 2024', img: './assets/proyecto-06-calendarios.jpg', desc: 'Diseño editorial, identidad corporativa y piezas impresas.', tools: 'InDesign · Illustrator' }
+    { id: 'p6', ch: ["Diseñar calendarios empresariales que fueran más allá de su función práctica y se convirtieran en piezas de comunicación de marca. El desafío fue integrar información, identidad corporativa y una propuesta visual atractiva en un formato pensado para acompañar al usuario durante todo el año.","Exploré conceptos visuales, imágenes y recursos gráficos para construir las portadas y páginas interiores. Trabajé en la distribución de los calendarios, la jerarquía de la información, la tipografía y la relación entre los elementos decorativos y los espacios destinados a la consulta de fechas.","Una colección de calendarios de escritorio y pared que combina funcionalidad, diseño editorial e identidad corporativa. Cada propuesta busca convertir una herramienta cotidiana en un soporte visual que refuerce la presencia de la marca y aporte valor durante el año."], title: 'Diseñando el valor del tiempo', category: 'Calendarios corporativos', year: '2023 · 2024', img: './assets/proyecto-06-calendarios.jpg', desc: 'Diseño editorial, identidad corporativa y piezas impresas.', tools: 'InDesign · Illustrator' },
+    { id: 'p7', ch: ["Diseñar un catálogo corporativo va más allá de organizar productos en una página. El reto está en presentar la información de forma clara, atractiva y coherente con la identidad de la marca, logrando que cada producto tenga su espacio y que la experiencia visual invite a descubrir más.", "Comienzo organizando la información y definiendo una estructura visual que facilite la lectura y la navegación. Trabajo con la composición, la tipografía, el color y las imágenes para crear una jerarquía clara, mantener la coherencia gráfica y destacar los productos de manera estratégica.", "Un catálogo que combina diseño, organización y comunicación visual para presentar los productos de forma atractiva y profesional. Cada página se convierte en una oportunidad para fortalecer la imagen de la marca, facilitar la consulta de la información y conectar con sus clientes."], title: 'Diseñando experiencias en cada página', category: 'Diseño editorial', year: '', img: './assets/proyecto-07-editorial.jpg', desc: '', tools: 'InDesign · Illustrator' },
+    { id: 'p8', ch: ["¿Cómo se vería una marca aplicada a un producto real? El reto consiste en llevar una identidad gráfica más allá de la pantalla y adaptarla a diferentes artículos promocionales, respetando sus formas, proporciones y superficies para lograr una presentación visual convincente.", "Utilizo CorelDRAW para preparar y adaptar los elementos gráficos de cada marca. Trabajo con logotipos, proporciones, colores y ubicaciones para integrarlos en las representaciones de los productos, cuidando los detalles y buscando que cada aplicación conserve la esencia de la identidad visual.", "Representaciones visuales de productos personalizados que permiten apreciar cómo puede funcionar una marca en diferentes aplicaciones. Estas composiciones ayudan a visualizar propuestas, presentar alternativas de personalización y comunicar el potencial de los artículos promocionales de una manera más atractiva."], title: 'La marca cobra forma', category: 'CorelDRAW', year: '', img: './assets/proyecto-08-coreldraw.jpg', desc: '', tools: 'CorelDRAW' },
+    { id: 'p9', ch: ["Crear una marca desde cero significa construir una identidad capaz de comunicar una idea, transmitir una personalidad y diferenciarse visualmente. En el proyecto Diáspora, el desafío fue desarrollar una propuesta gráfica coherente, desde el concepto inicial hasta los elementos que le dan vida a la marca.", "El proceso parte de explorar el concepto y definir la dirección visual de la marca. A partir de allí, trabajo en la construcción de la identidad gráfica, la selección de colores y tipografías, el desarrollo de los recursos visuales y sus posibles aplicaciones, buscando que cada elemento tenga sentido dentro del sistema de marca.", "Una propuesta de identidad visual para Diáspora, construida a partir de un concepto y desarrollada para mantener coherencia en sus diferentes elementos gráficos. El resultado reúne personalidad, intención y recursos visuales en una marca con una identidad propia y una base para su comunicación."], title: 'Una marca, un universo propio', category: 'Estrategia de marca', year: '', img: './assets/proyecto-09-marca.jpg', desc: '', tools: 'Illustrator' }
   ];
   sections = [
     { id: 'inicio', label: 'Inicio' }, { id: 'sobre-mi', label: 'Sobre mí' },
@@ -456,7 +464,7 @@ class Component extends DCLogic {
     const visible = list.map((p, i) => {
       const wide = i % 4 === 0 || i % 4 === 3;
       return {
-        ...p, open: e => this.flashOpen(p.id, e),
+        ...p, open: e => this.flashOpen(p.id, e), noImg: !p.img,
         itemStyle: {
           flex: wide ? '7 1 440px' : '5 1 320px', minWidth: 0,
           marginTop: 0,
@@ -465,7 +473,7 @@ class Component extends DCLogic {
         hoverOn: () => this.setState({ hoverId: p.id }),
         hoverOff: () => this.state.hoverId === p.id && this.setState({ hoverId: null }),
         floatStyle: { animation: 'jp-float ' + (6 + (i % 3) * 1.3) + 's ease-in-out ' + (i * .6) + 's infinite' },
-        mediaStyle: (() => { const on = this.state.hoverId === p.id; return { all: 'unset', boxSizing: 'border-box', cursor: 'pointer', display: 'block', width: '100%', aspectRatio: '2184 / 1708', borderRadius: 6, backgroundColor: '#141416', backgroundImage: 'url(' + p.img + ')', backgroundSize: 'cover', backgroundPosition: 'center', border: '1px solid ' + (on ? '#e8141b' : 'rgba(181,181,184,.14)'), transform: on ? 'scale(1.03)' : 'scale(1)', boxShadow: on ? '0 0 0 1px #e8141b, 0 0 14px rgba(232,20,27,.75), 0 0 44px rgba(232,20,27,.4), 0 30px 60px -30px rgba(0,0,0,.7)' : '0 30px 60px -30px rgba(0,0,0,.7)', transition: 'transform 1s cubic-bezier(.22,1,.36,1), box-shadow .6s cubic-bezier(.22,1,.36,1), border-color .6s' }; })()
+        mediaStyle: (() => { const on = this.state.hoverId === p.id; return { all: 'unset', boxSizing: 'border-box', cursor: 'pointer', display: 'block', width: '100%', aspectRatio: '2184 / 1708', borderRadius: 6, backgroundColor: '#141416', backgroundImage: p.img ? 'url(' + p.img + ')' : 'repeating-linear-gradient(135deg, rgba(181,181,184,.05) 0 14px, transparent 14px 28px)', backgroundSize: 'cover', backgroundPosition: 'center', display: 'grid', placeItems: 'center', border: (p.img ? '1px solid ' : '1.5px dashed ') + (on ? '#e8141b' : 'rgba(181,181,184,' + (p.img ? '.14' : '.35') + ')'), transform: on ? 'scale(1.03)' : 'scale(1)', boxShadow: on ? '0 0 0 1px #e8141b, 0 0 14px rgba(232,20,27,.75), 0 0 44px rgba(232,20,27,.4), 0 30px 60px -30px rgba(0,0,0,.7)' : '0 30px 60px -30px rgba(0,0,0,.7)', transition: 'transform 1s cubic-bezier(.22,1,.36,1), box-shadow .6s cubic-bezier(.22,1,.36,1), border-color .6s' }; })()
       };
     });
 
@@ -479,7 +487,7 @@ class Component extends DCLogic {
         { k: 'Rol', v: 'Diseño gráfico' }, { k: 'Herramientas', v: a.tools },
         { k: 'Categoría', v: a.category }, { k: 'Año', v: a.year || '—' }
       ],
-      content: this.contentMap[a.id] || '', hasContent: !!this.contentMap[a.id], noContent: !this.contentMap[a.id],
+      content: this.contentMap[a.id] || '', hasContent: !!this.contentMap[a.id], isVideos: a.id === 'p4', isEmpty: !this.contentMap[a.id] && a.id !== 'p4',
       chapters: [
         { n: '01', title: 'El reto', body: a.ch[0] },
         { n: '02', title: 'El proceso', body: a.ch[1] },
