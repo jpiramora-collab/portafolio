@@ -1,11 +1,12 @@
 # Portafolio · Josepf Pira Morales
 
-Sitio estático (un solo `index.html`). No necesita instalación ni build.
+Sitio estático: `index.html`, `support.js` y la carpeta `assets/`. No necesita instalación ni build.
 
 ## 1. Subir a GitHub (una sola vez)
 1. Entra a github.com → **New repository** → nombre: `portafolio` → Public → **Create**.
 2. En el repositorio vacío: **uploading an existing file**.
-3. Arrastra `index.html`, `vercel.json` y este `README.md` → **Commit changes**.
+3. Arrastra **todo el contenido** de la carpeta (`index.html`, `support.js`, `vercel.json`, `README.md` y la carpeta `assets`) → **Commit changes**.
+   Importante: `assets/` debe quedar como carpeta en la raíz del repo, al lado de `index.html`.
 
 ## 2. Conectar con Vercel (una sola vez)
 1. Entra a vercel.com → inicia sesión **con tu cuenta de GitHub**.
@@ -15,7 +16,7 @@ Sitio estático (un solo `index.html`). No necesita instalación ni build.
 
 ## 3. Cuando hagas cambios
 1. Haz los cambios en el diseño y pide de nuevo el paquete para Vercel (te entrego un `index.html` nuevo).
-2. En GitHub, abre el repo → **Add file → Upload files** → arrastra el nuevo `index.html` (reemplaza el anterior) → **Commit changes**.
+2. En GitHub, abre el repo → **Add file → Upload files** → arrastra los archivos nuevos/cambiados (`index.html` y, si hay imágenes nuevas, la carpeta `assets`) → **Commit changes**.
 3. Vercel detecta el commit y publica solo en ~30 segundos. No tienes que hacer nada en Vercel.
 
 ## Formulario de contacto
