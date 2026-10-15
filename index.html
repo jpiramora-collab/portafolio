@@ -349,22 +349,29 @@ button{font:inherit;color:inherit}
     <div style="position:sticky;top:0;z-index:2;background:rgba(20,20,22,.8);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(207,207,207,.1)">
       <div style="max-width:1320px;margin:0 auto;padding:0 clamp(1.25rem,.6rem + 3.2vw,3.5rem);height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px">
         <button type="button" onClick="{{ close }}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:.95rem;color:rgba(207,207,207,.72);min-height:44px" style-hover="color:#f2f2f2">← {{ tx.backPort }}</button>
-        <span style="font-size:.875rem;color:rgba(207,207,207,.72)"><span style="color:#b5b5b8;font-weight:600">{{ active.num }}</span> / {{ total }}</span>
+        <div style="display:flex;align-items:center;gap:clamp(.75rem,.5rem + 1vw,1.5rem)">
+          <div role="group" aria-label="Idioma / Language" style="display:flex;gap:2px;padding:3px;border-radius:999px;border:1px solid rgba(207,207,207,.14);background:rgba(20,20,22,.55)">
+            <sc-for list="{{ langs }}" as="l" hint-placeholder-count="3">
+              <button type="button" aria-pressed="{{ l.pressed }}" onClick="{{ l.select }}" style="{{ l.style }}" style-hover="color:#f2f2f2">{{ l.code }}</button>
+            </sc-for>
+          </div>
+          <span style="font-size:.875rem;color:rgba(207,207,207,.72);white-space:nowrap"><span style="color:#b5b5b8;font-weight:600">{{ active.num }}</span> / {{ total }}</span>
+        </div>
       </div>
     </div>
-    <article data-screen-label="Caso de estudio" style="max-width:1320px;margin:0 auto;padding:clamp(3rem,2rem + 4vw,6rem) clamp(1.25rem,.6rem + 3.2vw,3.5rem) 0">
+    <article data-screen-label="Caso de estudio" lang="{{ langAttr }}" style="max-width:1320px;margin:0 auto;padding:clamp(3rem,2rem + 4vw,6rem) clamp(1.25rem,.6rem + 3.2vw,3.5rem) 0">
       
       <header style="margin-bottom:clamp(3.5rem,2rem + 4vw,6rem);animation:jp-case-in .8s cubic-bezier(.22,1,.36,1) .1s both">
         <div style="display:flex;align-items:center;gap:14px"><span style="{{ active.badgeStyle }}">{{ active.code }}</span><span style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:1.5rem;color:#e8141b">{{ active.num }}</span><span style="font-size:1.1rem;font-weight:600;color:#cfcfcf">{{ active.category }}</span></div>
         <h2 style="margin:clamp(1.75rem,1rem + 2vw,3rem) 0 0;font-family:'Big Shoulders Display',sans-serif;line-height:.86;display:flex;flex-direction:column;text-wrap:balance"><span style="font-weight:500;font-size:clamp(2.4rem,1.4rem + 4vw,6.5rem);color:#cfcfcf">{{ active.tA }}</span><span style="font-weight:800;font-size:clamp(3rem,1.6rem + 6vw,9.4rem);letter-spacing:-.01em">{{ active.tB }}</span></h2>
         <span aria-hidden="true" style="display:block;width:120px;height:10px;margin:clamp(1.5rem,1rem + 1.5vw,2.5rem) 0 clamp(1.25rem,1rem + 1vw,2rem);background:#e8141b"></span>
-        <sc-if value="{{ active.hasDesc }}" hint-placeholder-val="{{ true }}"><p style="margin:0;max-width:34ch;font-size:clamp(1.15rem,1rem + .7vw,2rem);font-weight:500;line-height:1.35;color:#cfcfcf;text-wrap:pretty">{{ active.desc }}</p></sc-if>
+        <sc-if value="{{ active.hasDesc }}" hint-placeholder-val="{{ true }}"><p style="margin:0;max-width:34ch;font-size:clamp(1.15rem,1rem + .7vw,2rem);font-weight:500;line-height:1.35;color:#cfcfcf;text-align:justify;hyphens:auto;-webkit-hyphens:auto">{{ active.descNb }}</p></sc-if>
       </header>
       <div style="display:grid;gap:clamp(3rem,2rem + 3vw,5rem)">
         <sc-for list="{{ active.chapters }}" as="c" hint-placeholder-count="3">
           <div style="{{ c.anim }}">
             <h3 style="margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:clamp(1.75rem,1.3rem + 1.6vw,2.75rem);line-height:1"><span style="display:block;font-family:'Hanken Grotesk',sans-serif;font-size:.875rem;font-weight:600;color:#e8141b;margin-bottom:10px">{{ c.n }}</span>{{ c.title }}</h3>
-            <p style="margin:0;max-width:56ch;line-height:1.6;color:#cfcfcf;text-wrap:pretty">{{ c.body }}</p>
+            <p style="margin:0;max-width:56ch;line-height:1.6;color:#cfcfcf;text-align:justify;hyphens:auto;-webkit-hyphens:auto">{{ c.body }}</p>
           </div>
         </sc-for>
       </div>
@@ -409,7 +416,7 @@ button{font:inherit;color:inherit}
         <sc-if value="{{ active.hasQuote }}" hint-placeholder-val="{{ true }}">
           <blockquote style="margin:clamp(4.5rem,3rem + 4vw,7rem) auto 0;max-width:900px;display:grid;justify-items:center;gap:.5rem;text-align:center">
             <span aria-hidden="true" style="display:block;height:.62em;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:clamp(5rem,4rem + 3vw,8.75rem);line-height:.9;color:#e8141b">“</span>
-            <p style="margin:0;font-size:clamp(1.15rem,1rem + .6vw,1.75rem);font-weight:500;line-height:1.5;color:#e6e6e6;text-wrap:pretty">{{ active.quote }}</p>
+            <p style="margin:0;font-size:clamp(1.15rem,1rem + .6vw,1.75rem);font-weight:500;line-height:1.5;color:#e6e6e6;text-align:justify;text-align-last:center;hyphens:auto;-webkit-hyphens:auto">{{ active.quoteNb }}</p>
           </blockquote>
         </sc-if>
       </div>
@@ -525,6 +532,7 @@ class Component extends DCLogic {
     }
     return this.neonCache[key];
   }
+  nb(s) { return String(s || '').replace(/(^|[\s(«“])([A-Za-zÁÉÍÓÚáéíóúñÑçÇãõâêô]{1,3}|[0-9]{1,2})\s+/g, (m, p, w) => p + w + '\u00a0').replace(/(^|[\s(«“])([A-Za-zÁÉÍÓÚáéíóúñÑçÇãõâêô]{1,3})\s+/g, (m, p, w) => p + w + '\u00a0'); }
   fitCovers() {
     document.querySelectorAll('[data-cover-title]').forEach(t => {
       const card = t.closest('[style*="container-type"]') || t.parentElement.parentElement; const cw = card.getBoundingClientRect().width; if (!cw) return;
@@ -711,11 +719,11 @@ class Component extends DCLogic {
         { k: 'Rol', v: 'Diseño gráfico' }, { k: 'Herramientas', v: a.tools },
         { k: 'Categoría', v: a.category }, { k: 'Año', v: a.year || '—' }
       ],
-      groups: this.groupsOf(a), hasContent: !!(a.groups && a.groups.length), isVideos: a.id === 'p4', isEmpty: !(a.groups && a.groups.length) && a.id !== 'p4', tA: this.splitOf(a)[0], tB: this.splitOf(a)[1], badgeStyle: this.badge(a, true), hasDesc: !!a.desc, hasQuote: !!a.quote,
+      groups: this.groupsOf(a), hasContent: !!(a.groups && a.groups.length), isVideos: a.id === 'p4', isEmpty: !(a.groups && a.groups.length) && a.id !== 'p4', tA: this.splitOf(a)[0], tB: this.splitOf(a)[1], badgeStyle: this.badge(a, true), hasDesc: !!a.desc, hasQuote: !!a.quote, quoteNb: this.nb(a.quote), descNb: this.nb(a.desc),
       chapters: [
-        { n: '01', title: tx.ch[0], body: a.ch[0] },
-        { n: '02', title: tx.ch[1], body: a.ch[1] },
-        { n: '03', title: tx.ch[2], body: a.ch[2] }
+        { n: '01', title: tx.ch[0], body: this.nb(a.ch[0]) },
+        { n: '02', title: tx.ch[1], body: this.nb(a.ch[1]) },
+        { n: '03', title: tx.ch[2], body: this.nb(a.ch[2]) }
       ].map((c, i) => ({ ...c, anim: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))', gap: 'clamp(1rem,1rem + 3vw,5rem)', alignItems: 'start', animation: `jp-case-in .8s cubic-bezier(.22,1,.36,1) ${0.35 + i * 0.35}s both` } }))
     } : {};
     const next = a ? all[(idx + 1) % all.length] : {};
@@ -726,7 +734,7 @@ class Component extends DCLogic {
     return {
       year: new Date().getFullYear(),
       videoGroups: this.videoGroups.map((g, i) => ({ ...g, label: tx.vg[i] })),
-      tx,
+      tx, langAttr: this.state.lang,
       langs: ['es', 'en', 'pt'].map(l => { const on = this.state.lang === l; return { code: l.toUpperCase(), pressed: on ? 'true' : 'false', select: () => this.setLang(l), style: { cursor: 'pointer', border: 0, minWidth: 38, minHeight: 34, padding: '0 10px', borderRadius: 999, fontSize: '.78rem', fontWeight: 600, letterSpacing: '.06em', background: on ? '#e8141b' : 'transparent', color: on ? '#f2f2f2' : 'rgba(207,207,207,.72)', transition: 'background-color .3s, color .22s' } }; }),
       hasFlash: !!this.state.flash, flashKey: this.state.flash ? String(this.state.flash.k) : '0',
       flashStyle: this.state.flash ? { position: 'fixed', inset: -(window.innerWidth * .3) + 'px', zIndex: 80, pointerEvents: 'none', transformOrigin: (this.state.flash.x + window.innerWidth * .3) + 'px ' + (this.state.flash.y + window.innerWidth * .3) + 'px', background: 'radial-gradient(circle at ' + (this.state.flash.x + window.innerWidth * .3) + 'px ' + (this.state.flash.y + window.innerWidth * .3) + 'px, rgba(255,90,90,.95) 0%, rgba(232,20,27,.85) 12%, rgba(163,13,18,.55) 32%, rgba(20,20,22,.2) 60%, transparent 75%)', animation: 'jp-flash .95s cubic-bezier(.22,1,.36,1) both' } : {},
