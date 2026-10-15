@@ -185,10 +185,10 @@ button{font:inherit;color:inherit}
                 <span style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:2.3cqw;line-height:1;color:#e8141b">{{ p.num }}</span>
                 <span style="margin-left:.5cqw;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:1.85cqw;line-height:1;color:#e9e9e9;white-space:nowrap">{{ p.cv.tool }}</span>
               </span>
-              <span style="position:absolute;left:6.07%;top:49.6%;transform:translateY(-50%);width:42cqw;display:flex;flex-direction:column">
-                <span style="font-family:'Big Shoulders Display',sans-serif;font-size:6.2cqw;line-height:.95;letter-spacing:-.01em;text-transform:none">
+              <span style="position:absolute;left:6.07%;top:49.6%;transform:translateY(-50%);width:38.5cqw;display:flex;flex-direction:column">
+                <span data-cover-title="1" style="font-family:'Big Shoulders Display',sans-serif;font-size:6.2cqw;line-height:.95;letter-spacing:-.01em;text-transform:none">
                   <span style="display:block;font-weight:300;color:#d6d6d6">{{ p.cv.a }}</span>
-                  <sc-for list="{{ p.cv.lines }}" as="ln" hint-placeholder-count="1"><span style="display:block;font-weight:800;font-size:1.18em;line-height:.9;color:#f2f2f2;white-space:nowrap">{{ ln.t }}<span style="color:#e8141b">{{ ln.red }}</span></span></sc-for>
+                  <sc-for list="{{ p.cv.lines }}" as="ln" hint-placeholder-count="1"><span style="{{ ln.style }}">{{ ln.t }}<span style="color:#e8141b">{{ ln.red }}</span></span></sc-for>
                 </span>
                 <span style="margin-top:2.7cqw;width:7.43cqw;height:.57cqw;background:#e8141b"></span>
                 <span style="margin-top:2.9cqw;max-width:25cqw;font-family:'Hanken Grotesk',sans-serif;font-weight:500;font-size:1.85cqw;line-height:1.36;color:#cfcfcf;text-wrap:balance">{{ p.cv.sub }}</span>
@@ -469,7 +469,7 @@ class Component extends DCLogic {
       visual: './assets/portadas/visual-' + n + '.webp', badge: './assets/portadas/badge-' + n + '.webp',
       badgeStyle: { display: 'block', width: (p.id === 'p4' ? 11.86 : 6.57) + 'cqw', height: '6.57cqw' },
       tool: (es && o.tool) || p.category, a: (lines === o.lines && o.a) || p.tA || '', sub: (p.desc || '').replace(/\.$/, ''), sign: this.coverSign[l] || this.coverSign.es,
-      lines: lines.map(t => t.startsWith('|') ? { t: '', red: t.slice(1) } : { t, red: '' })
+      lines: (() => { const fixed = lines === o.lines; const st = { display: 'block', fontWeight: 800, fontSize: '1.18em', lineHeight: .9, color: '#f2f2f2', whiteSpace: fixed ? 'nowrap' : 'normal' }; return lines.map(t => t.startsWith('|') ? { t: '', red: t.slice(1), style: st } : { t, red: '', style: st }); })()
     };
   }
   oldCovers = {"p1":"./assets/proyecto-01-photoshop.jpg","p2":"./assets/proyecto-02-illustrator.jpg","p3":"./assets/proyecto-03-redes.jpg","p4":"./assets/proyecto-04-videos.jpg","p5":"./assets/proyecto-05-mailings.jpg","p6":"./assets/proyecto-06-calendarios.jpg","p7":"./assets/proyecto-07-editorial.jpg","p8":"./assets/proyecto-08-coreldraw.jpg","p9":"./assets/proyecto-09-marca.jpg","p10":"./assets/proyecto-10-gaming.jpg"};
@@ -508,7 +508,7 @@ class Component extends DCLogic {
     wa: 'Hola JP, vi tu portafolio y me gustaría hablar contigo.', vg: ['Videos de campaña', 'Tutorial de la plataforma']
   };
   pack() { const l = this.state.lang; return l !== 'es' && window.JP_I18N && window.JP_I18N[l] ? window.JP_I18N[l] : null; }
-  setLang(l) { try { localStorage.setItem('jp-lang', l); } catch (e) {} document.documentElement.lang = l === 'cl' ? 'es-CL' : l; this.setState({ lang: l }); }
+  setLang(l) { try { localStorage.setItem('jp-lang', l); } catch (e) {} document.documentElement.lang = l === 'cl' ? 'es-CL' : l; this.setState({ lang: l }, () => setTimeout(() => this.fitCovers(), 60)); }
   nickFonts = [
     { f: "'Big Shoulders Display',sans-serif", w: 800, s: '1em', st: 'normal' },
     { f: "'Playfair Display',serif", w: 800, s: '.86em', st: 'italic' },
@@ -525,7 +525,18 @@ class Component extends DCLogic {
     }
     return this.neonCache[key];
   }
+  fitCovers() {
+    document.querySelectorAll('[data-cover-title]').forEach(t => {
+      const card = t.closest('[style*="container-type"]') || t.parentElement.parentElement; const cw = card.getBoundingClientRect().width; if (!cw) return;
+      let fs = 6.2; t.style.fontSize = fs + 'cqw';
+      const widest = () => { let m = 0; const w = document.createTreeWalker(t, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!n.textContent.trim()) continue; const rg = document.createRange(); rg.selectNodeContents(n); [...rg.getClientRects()].forEach(x => { m = Math.max(m, x.right); }); } return (m - card.getBoundingClientRect().left) / cw; };
+      let guard = 0; while (widest() > 0.42 && fs > 4.2 && guard++ < 30) { fs -= 0.1; t.style.fontSize = fs.toFixed(2) + 'cqw'; }
+    });
+  }
   componentDidMount() {
+    this.onFitResize = () => { clearTimeout(this.fitT); this.fitT = setTimeout(() => this.fitCovers(), 150); };
+    window.addEventListener('resize', this.onFitResize);
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(() => this.fitCovers(), 50));
     document.documentElement.lang = this.state.lang === 'cl' ? 'es-CL' : this.state.lang;
     this.onI18n = () => this.forceUpdate();
     window.addEventListener('jp-i18n', this.onI18n);
@@ -564,7 +575,7 @@ class Component extends DCLogic {
     setTimeout(this.onScroll, 0);
   }
   componentWillUnmount() {
-    clearInterval(this.nickTimer); window.removeEventListener('jp-i18n', this.onI18n);
+    clearInterval(this.nickTimer); window.removeEventListener('resize', this.onFitResize); window.removeEventListener('jp-i18n', this.onI18n);
     window.removeEventListener('scroll', this.onScroll); window.removeEventListener('resize', this.onResize);
     window.removeEventListener('keydown', this.onKey); this.io && this.io.disconnect(); document.body.style.overflow = '';
   }
@@ -663,7 +674,7 @@ class Component extends DCLogic {
       return {
         label: c === 'Todos' ? tx.all : c, active: on ? 'true' : 'false',
         count: c === 'Todos' ? all.length : all.filter(p => p.category === c).length,
-        select: () => this.setState({ filter: c }),
+        select: () => this.setState({ filter: c }, () => setTimeout(() => this.fitCovers(), 60)),
         style: {
           cursor: 'pointer', minHeight: 44, whiteSpace: 'nowrap', padding: '0 18px', borderRadius: 999, fontSize: '.9rem', fontWeight: 500,
           border: '1px solid ' + (on ? '#e8141b' : 'rgba(207,207,207,.22)'),
