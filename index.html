@@ -182,8 +182,8 @@ button{font:inherit;color:inherit}
               <img src="{{ p.cv.visual }}" alt="" width="760" height="1095" loading="lazy" decoding="async" style="position:absolute;top:0;right:0;width:54.29%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7%);mask-image:linear-gradient(90deg,transparent 0,#000 7%)" />
               <span style="position:absolute;left:5.57%;top:7.12%;height:8.4%;display:flex;align-items:center;gap:.86cqw">
                 <img src="{{ p.cv.badge }}" alt="" loading="lazy" decoding="async" style="{{ p.cv.badgeStyle }}" />
-                <span style="font-family:'Big Shoulders Display',sans-serif;font-weight:700;font-size:2.3cqw;line-height:1;color:#e8141b">{{ p.num }}</span>
-                <span style="margin-left:.5cqw;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:1.85cqw;line-height:1;color:#e9e9e9;white-space:nowrap">{{ p.cv.tool }}</span>
+                <span style="{{ p.cv.numStyle }}">{{ p.num }}</span>
+                <span style="{{ p.cv.toolStyle }}">{{ p.cv.tool }}</span>
               </span>
               <span style="position:absolute;left:6.07%;top:49.6%;transform:translateY(-50%);width:38.5cqw;display:flex;flex-direction:column">
                 <span data-cover-title="1" style="font-family:'Big Shoulders Display',sans-serif;font-size:6.2cqw;line-height:.95;letter-spacing:-.01em;text-transform:none">
@@ -191,10 +191,10 @@ button{font:inherit;color:inherit}
                   <sc-for list="{{ p.cv.lines }}" as="ln" hint-placeholder-count="1"><span style="{{ ln.style }}">{{ ln.t }}<span style="color:#e8141b">{{ ln.red }}</span></span></sc-for>
                 </span>
                 <span style="margin-top:2.7cqw;width:7.43cqw;height:.57cqw;background:#e8141b"></span>
-                <span style="margin-top:2.9cqw;max-width:25cqw;font-family:'Hanken Grotesk',sans-serif;font-weight:500;font-size:1.85cqw;line-height:1.36;color:#cfcfcf;text-wrap:balance">{{ p.cv.sub }}</span>
+                <sc-if value="{{ p.cv.full }}" hint-placeholder-val="{{ true }}"><span style="margin-top:2.9cqw;max-width:25cqw;font-family:'Hanken Grotesk',sans-serif;font-weight:500;font-size:1.85cqw;line-height:1.36;color:#cfcfcf;text-wrap:balance">{{ p.cv.sub }}</span></sc-if>
               </span>
               <span style="position:absolute;left:6.07%;bottom:7.4%;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:8.6cqw;line-height:.78;letter-spacing:-.04em;color:#f2f2f2">JP</span>
-              <span style="position:absolute;left:25.86%;bottom:7.6%;font-family:'Hanken Grotesk',sans-serif;font-weight:400;font-size:1.36cqw;line-height:1;color:#9a9a9a;white-space:nowrap">{{ p.cv.sign }}</span>
+              <sc-if value="{{ p.cv.full }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;left:25.86%;bottom:7.6%;font-family:'Hanken Grotesk',sans-serif;font-weight:400;font-size:1.36cqw;line-height:1;color:#9a9a9a;white-space:nowrap">{{ p.cv.sign }}</span></sc-if>
             </span></button></div>
           </article>
         </sc-for>
@@ -474,7 +474,10 @@ class Component extends DCLogic {
     if (!lines) { const m = p.id === 'p10' && (p.tB || '').match(/^(.*?)\s*(gam(?:ing|er))$/i); lines = m ? [m[1], '|' + m[2]] : [p.tB || '']; }
     return {
       visual: './assets/portadas/visual-' + n + '.webp', badge: './assets/portadas/badge-' + n + '.webp',
-      badgeStyle: { display: 'block', width: (p.id === 'p4' ? 11.86 : 6.57) + 'cqw', height: '6.57cqw' },
+      full: !this.state.narrow,
+      numStyle: { fontFamily: "'Big Shoulders Display',sans-serif", fontWeight: 700, fontSize: this.state.narrow ? '4.2cqw' : '2.3cqw', lineHeight: 1, color: '#e8141b' },
+      toolStyle: { marginLeft: '.5cqw', fontFamily: "'Hanken Grotesk',sans-serif", fontWeight: 600, fontSize: this.state.narrow ? '3.4cqw' : '1.85cqw', lineHeight: 1, color: '#e9e9e9', whiteSpace: 'nowrap' },
+      badgeStyle: { display: 'block', width: (p.id === 'p4' ? 11.86 : 6.57) * (this.state.narrow ? 1.35 : 1) + 'cqw', height: 6.57 * (this.state.narrow ? 1.35 : 1) + 'cqw' },
       tool: (es && o.tool) || p.category, a: (lines === o.lines && o.a) || p.tA || '', sub: (p.desc || '').replace(/\.$/, ''), sign: this.coverSign[l] || this.coverSign.es,
       lines: (() => { const fixed = lines === o.lines; const st = { display: 'block', fontWeight: 800, fontSize: '1.18em', lineHeight: .9, color: '#f2f2f2', whiteSpace: fixed ? 'nowrap' : 'normal' }; return lines.map(t => t.startsWith('|') ? { t: '', red: t.slice(1), style: st } : { t, red: '', style: st }); })()
     };
@@ -571,7 +574,7 @@ class Component extends DCLogic {
         if (sec !== this.state.section) this.setState({ section: sec });
       });
     };
-    this.onResize = () => { const n = window.innerWidth <= 760; if (n !== this.state.narrow) this.setState({ narrow: n, menuOpen: n ? this.state.menuOpen : false }); };
+    this.onResize = () => { const n = window.innerWidth <= 760; if (n !== this.state.narrow) this.setState({ narrow: n, menuOpen: n ? this.state.menuOpen : false }, () => setTimeout(() => this.fitCovers(), 60)); };
     this.onKey = e => {
       if (e.key !== 'Escape') return;
       if (this.state.contactOpen) this.closeContact(); else if (this.state.activeId) this.close(); else if (this.state.menuOpen) this.setState({ menuOpen: false });
